@@ -264,13 +264,13 @@ body.menu-open {
 }
 
 .brand-logo {
-  height: 24px; /* tamanho da logo */
+  height: 32px; /* tamanho da logo */
   width: auto;
   display: block;
 }
 
 .brand-name {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   letter-spacing: -0.02em;
 }
 
