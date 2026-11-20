@@ -54,17 +54,3 @@
   outline: 2px solid color-mix(in srgb, var(--accent) 60%, white);
   outline-offset: 3px;
 }
-
-.made-with {
-  text-align: center;
-  font-size: 0.8rem;
-}
-
-.made-with a {
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.made-with a:hover {
-  color: var(--text-main);
-}

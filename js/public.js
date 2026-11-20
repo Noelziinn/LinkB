@@ -164,7 +164,6 @@ async function init() {
   $("state").hidden = true;
   $("profile").hidden = false;
   list.hidden = false;
-  $("made-with").hidden = false;
 }
 
 init();
