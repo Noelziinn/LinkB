@@ -1,4 +1,4 @@
-// Menu lateral (três pontinhos). Precisa do supabase.js carregado antes.
+// Menu lateral (três pontinhos) + logo. Precisa do supabase.js carregado antes.
 (() => {
   const el = (tag, cls, text) => {
     const n = document.createElement(tag);
@@ -13,6 +13,17 @@
     return i;
   };
 
+  // Logo + nome (usada no topo da página e dentro do menu)
+  function makeBrand(extraClass = "") {
+    const a = el("a", "brand " + extraClass);
+    a.href = "index.html";
+    const img = el("img", "brand-logo");
+    img.src = "logo.png"; // arquivo na raiz do projeto
+    img.alt = "";
+    a.append(img, el("span", "brand-name", "LinkB"));
+    return a;
+  }
+
   const menuLink = (href, iconName, label, extraClass = "") => {
     const a = el("a", "menu-item " + extraClass);
     a.href = href;
@@ -21,6 +32,8 @@
   };
 
   // ===== Estrutura fixa =====
+  const brand = makeBrand("brand-top");
+
   const toggle = el("button", "menu-toggle");
   toggle.type = "button";
   toggle.setAttribute("aria-label", "Abrir menu");
@@ -40,20 +53,14 @@
   closeBtn.type = "button";
   closeBtn.setAttribute("aria-label", "Fechar menu");
   closeBtn.append(icon("ph-x"));
-  head.append(el("span", "", "Menu"), closeBtn);
+  head.append(makeBrand(), closeBtn);
 
   const userBox = el("div");
   const nav = el("nav", "menu-nav");
   panel.append(head, userBox, nav);
 
-  const brand = el("a", "brand");
-  brand.href = "index.html";
-  const logo = el("img", "brand-logo");
-  logo.src = "logo.png"; // coloque o arquivo na raiz do projeto
-  logo.alt = "";
-  brand.append(logo, el("span", "", "LinkB"));
-
   document.body.append(brand, toggle, overlay, panel);
+  document.body.classList.add("has-menu");
 
   // ===== Abrir e fechar =====
   function openMenu() {
@@ -85,14 +92,12 @@
   function makeAvatar(profile) {
     const name = profile.display_name || profile.username;
 
-    const fallback = () => {
-      const d = el(
+    const fallback = () =>
+      el(
         "div",
         "menu-avatar menu-avatar-fallback",
         name.trim().charAt(0).toUpperCase() || "?",
       );
-      return d;
-    };
 
     if (profile.avatar_url && /^https?:\/\//i.test(profile.avatar_url)) {
       const img = el("img", "menu-avatar");

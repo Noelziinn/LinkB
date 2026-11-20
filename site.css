@@ -246,29 +246,69 @@ body.menu-open {
   }
 }
 
+/* ===== Logo + nome (solta, sem card) ===== */
 .brand {
-  position: fixed;
-  top: calc(16px + env(safe-area-inset-top, 0px));
-  right: 70px; /* 16px da borda + 44px do botão + 10px de espaço */
-  z-index: 30;
-  height: 44px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 14px 0 10px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
   color: var(--text-main);
   font-weight: 700;
   font-size: 0.95rem;
   text-decoration: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+}
+
+.brand:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 4px;
+  border-radius: 6px;
 }
 
 .brand-logo {
-  height: 32px; /* tamanho da logo: aumente ou diminua aqui */
-  width: auto; /* mantém a proporção */
+  height: 24px; /* tamanho da logo */
+  width: auto;
   display: block;
+}
+
+.brand-name {
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+/* No topo das páginas que têm o menu (ao lado dos três pontinhos) */
+.brand-top {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 70px;
+  height: 44px;
+  z-index: 30;
+}
+
+/* Centralizada acima do card (login e nova senha) */
+.brand-center {
+  align-self: center;
+}
+
+/* Versão maior, pro login */
+.brand-lg {
+  gap: 10px;
+}
+.brand-lg .brand-logo {
+  height: 36px;
+}
+.brand-lg .brand-name {
+  font-size: 1.35rem;
+}
+
+/* Reserva espaço no topo pra logo não ficar em cima do conteúdo */
+body.has-menu {
+  padding-top: calc(76px + env(safe-area-inset-top, 0px));
+}
+
+/* Celular: logo centralizada no topo */
+@media (max-width: 600px) {
+  .brand-top {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }

@@ -242,3 +242,15 @@ body.dash {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
+
+.dash-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dash-logo {
+  height: 40px; /* tamanho da logo no painel */
+  width: auto;
+  display: block;
+}
