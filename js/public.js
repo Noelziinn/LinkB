@@ -161,6 +161,16 @@ async function init() {
     safeLinks.forEach((l) => list.append(renderLink(l)));
   }
 
+  // Link de denúncia (usa o e-mail do config.js)
+  const report = $("report-link");
+  if (report && typeof CONTACT_EMAIL !== "undefined") {
+    const subject = encodeURIComponent("Denúncia: página /" + profile.username);
+    const body = encodeURIComponent("Descreva o motivo da denúncia:\n\n");
+    report.href =
+      "mailto:" + CONTACT_EMAIL + "?subject=" + subject + "&body=" + body;
+    report.hidden = false;
+  }
+
   $("state").hidden = true;
   $("profile").hidden = false;
   list.hidden = false;

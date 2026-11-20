@@ -142,6 +142,33 @@
         <h2>Seus links</h2>
         <ul id="link-list" class="link-list"></ul>
       </section>
+
+      <!-- area de deletar conta-->
+      <section class="panel danger-zone">
+        <h2>Excluir conta</h2>
+        <p class="muted-text">
+          Isso apaga para sempre a sua conta, o seu perfil e todos os seus
+          links. Sua página deixa de existir e o nome de usuário fica livre para
+          outras pessoas. Não dá para desfazer.
+        </p>
+        <div class="field">
+          <label for="delete-confirm"
+            >Para confirmar, digite <strong id="delete-username"></strong
+          ></label>
+          <input
+            id="delete-confirm"
+            type="text"
+            autocomplete="off"
+            autocapitalize="none"
+            spellcheck="false"
+            placeholder="seu nome de usuário"
+          />
+        </div>
+        <p id="delete-msg" class="message" role="alert" hidden></p>
+        <button id="delete-btn" type="button" class="btn-danger" disabled>
+          Excluir minha conta para sempre
+        </button>
+      </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>

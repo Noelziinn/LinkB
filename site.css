@@ -312,3 +312,20 @@ body.has-menu {
     transform: translateX(-50%);
   }
 }
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.78rem;
+}
+
+.footer-links a {
+  color: #71717a;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--text-main);
+}

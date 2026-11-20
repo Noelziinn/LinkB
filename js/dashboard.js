@@ -62,6 +62,7 @@ async function loadProfile() {
 
   profile = data;
   $("who").textContent = "@" + profile.username;
+  $("delete-username").textContent = profile.username;
   $("public-link").href = "u.html?user=" + encodeURIComponent(profile.username);
   $("display_name").value = profile.display_name || "";
   $("bio").value = profile.bio || "";
@@ -340,5 +341,45 @@ async function moveLink(index, direction) {
 
 // ===== Sair =====
 $("logout-btn").addEventListener("click", logout);
+
+// ===== Excluir conta =====
+const deleteInput = $("delete-confirm");
+const deleteBtn = $("delete-btn");
+
+function confirmationMatches() {
+  return (
+    !!profile && deleteInput.value.trim().toLowerCase() === profile.username
+  );
+}
+
+// O botão só liga quando o nome de usuário digitado bate
+deleteInput.addEventListener("input", () => {
+  deleteBtn.disabled = !confirmationMatches();
+});
+
+deleteBtn.addEventListener("click", async () => {
+  if (!confirmationMatches()) return;
+
+  deleteBtn.disabled = true;
+  deleteInput.disabled = true;
+
+  const { error } = await db.rpc("delete_my_account");
+
+  if (error) {
+    console.error(error);
+    showMsg(
+      $("delete-msg"),
+      "Não foi possível excluir a conta. Tente de novo.",
+      "error",
+    );
+    deleteInput.disabled = false;
+    deleteBtn.disabled = !confirmationMatches();
+    return;
+  }
+
+  // A conta já não existe no servidor; só limpa a sessão local
+  await db.auth.signOut({ scope: "local" });
+  window.location.href = "login.html?conta=excluida";
+});
 
 init();

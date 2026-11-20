@@ -1,0 +1,65 @@
+/* Termos de Uso e Política de Privacidade */
+
+body.legal {
+  align-items: flex-start;
+}
+
+.container.legal-page {
+  max-width: 720px;
+  gap: 20px;
+  padding-bottom: 32px;
+}
+
+.legal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  font-size: 0.93rem;
+  line-height: 1.65;
+  color: #d4d4d8;
+}
+
+.legal-card h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.legal-card h2 {
+  margin-top: 14px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.legal-card ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 22px;
+}
+
+.legal-card a {
+  color: #818cf8;
+}
+
+.legal-updated {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.legal-back {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.legal-back:hover {
+  color: var(--text-main);
+}

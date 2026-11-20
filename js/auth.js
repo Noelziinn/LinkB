@@ -11,6 +11,8 @@ const toggleText = document.getElementById("toggle-text");
 const toggleBtn = document.getElementById("toggle-btn");
 const messageBox = document.getElementById("message");
 const forgotBtn = document.getElementById("forgot-btn");
+const termsField = document.getElementById("terms-field");
+const termsInput = document.getElementById("terms");
 
 let mode = "login"; // "login" | "signup"
 
@@ -41,6 +43,35 @@ const RESERVED_USERNAMES = [
   "public",
   "site",
 ];
+
+// ===== CAPTCHA (Cloudflare Turnstile) =====
+let captchaToken = null;
+let captchaWidgetId = null;
+
+// O script do Turnstile chama esta função quando termina de carregar
+window.onloadTurnstileCallback = () => {
+  if (!TURNSTILE_SITE_KEY) return;
+  captchaWidgetId = turnstile.render("#captcha", {
+    sitekey: TURNSTILE_SITE_KEY,
+    theme: "dark",
+    callback: (token) => {
+      captchaToken = token;
+    },
+    "expired-callback": () => {
+      captchaToken = null;
+    },
+    "error-callback": () => {
+      captchaToken = null;
+    },
+  });
+};
+
+// Cada token só vale uma vez, então renovamos depois de cada tentativa
+function resetCaptcha() {
+  captchaToken = null;
+  if (captchaWidgetId !== null && window.turnstile)
+    turnstile.reset(captchaWidgetId);
+}
 
 // ===== Utilidades =====
 function showMessage(text, type = "error") {
@@ -73,11 +104,22 @@ function translateError(error) {
     return "Confirme seu e-mail antes de entrar.";
   if (msg.includes("password should be at least"))
     return "A senha precisa ter pelo menos 6 caracteres.";
+  if (msg.includes("captcha"))
+    return "Não foi possível verificar que você não é um robô. Tente de novo.";
   if (msg.includes("rate limit"))
     return "Muitas tentativas. Espere um pouco e tente de novo.";
   if (msg.includes("valid email") || msg.includes("invalid email"))
     return "Digite um e-mail válido.";
   return "Algo deu errado. Tente de novo.";
+}
+
+// Retorna true se pode seguir; senão mostra o aviso
+function captchaOk() {
+  if (TURNSTILE_SITE_KEY && !captchaToken) {
+    showMessage("Aguarde a verificação de segurança terminar e tente de novo.");
+    return false;
+  }
+  return true;
 }
 
 // ===== Alternar entre login e cadastro =====
@@ -91,8 +133,9 @@ function setMode(newMode) {
     ? "Escolha seu usuário e monte seu link na bio."
     : "Acesse seu painel para editar seus links.";
   usernameField.hidden = !isSignup;
-  forgotBtn.hidden = isSignup;
   usernameInput.required = isSignup;
+  forgotBtn.hidden = isSignup;
+  termsField.hidden = !isSignup;
   passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
   toggleText.textContent = isSignup ? "Já tem conta?" : "Ainda não tem conta?";
   toggleBtn.textContent = isSignup ? "Entrar" : "Criar conta";
@@ -106,6 +149,11 @@ toggleBtn.addEventListener("click", () => {
 // Abre direto no cadastro com login.html#cadastro
 if (location.hash === "#cadastro") setMode("signup");
 
+// Aviso depois de excluir a conta
+if (new URLSearchParams(location.search).get("conta") === "excluida") {
+  showMessage("Sua conta foi excluída com sucesso.", "success");
+}
+
 // ===== Envio do formulário =====
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -113,6 +161,16 @@ form.addEventListener("submit", async (e) => {
 
   const email = emailInput.value.trim();
   const password = passwordInput.value;
+
+  if (mode === "signup" && !termsInput.checked) {
+    showMessage(
+      "Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.",
+    );
+    return;
+  }
+  if (!captchaOk()) return;
+
+  const captchaOpt = captchaToken ? { captchaToken } : {};
 
   setLoading(true);
 
@@ -149,8 +207,10 @@ form.addEventListener("submit", async (e) => {
         email,
         password,
         options: {
-          data: { username }, // o trigger do banco cria o perfil com esse valor
+          // o trigger do banco cria o perfil com o username
+          data: { username, terms_accepted_at: new Date().toISOString() },
           emailRedirectTo: new URL("dashboard.html", location.href).href,
+          ...captchaOpt,
         },
       });
 
@@ -165,7 +225,11 @@ form.addEventListener("submit", async (e) => {
         );
       }
     } else {
-      const { error } = await db.auth.signInWithPassword({ email, password });
+      const { error } = await db.auth.signInWithPassword({
+        email,
+        password,
+        options: captchaOpt,
+      });
       if (error) throw error;
       window.location.href = "dashboard.html";
     }
@@ -174,6 +238,7 @@ form.addEventListener("submit", async (e) => {
     showMessage(translateError(error));
   } finally {
     setLoading(false);
+    resetCaptcha();
   }
 });
 
@@ -189,12 +254,17 @@ forgotBtn.addEventListener("click", async () => {
     emailInput.focus();
     return;
   }
+  if (!captchaOk()) return;
+
+  const captchaOpt = captchaToken ? { captchaToken } : {};
 
   forgotBtn.disabled = true;
   const { error } = await db.auth.resetPasswordForEmail(email, {
     redirectTo: new URL("reset-password.html", location.href).href,
+    ...captchaOpt,
   });
   forgotBtn.disabled = false;
+  resetCaptcha();
 
   if (error) {
     console.error(error);

@@ -22,6 +22,7 @@ body {
   background-color: var(--bg-dark);
   color: var(--text-main);
   min-height: 100vh;
+  min-height: 100dvh; /* altura real da tela no celular */
   display: flex;
   justify-content: center;
   align-items: center;

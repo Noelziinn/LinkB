@@ -147,3 +147,29 @@
   font-size: 0.85rem;
   font-weight: 500;
 }
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.check a {
+  color: #818cf8;
+}
+
+#captcha:empty {
+  display: none;
+}
