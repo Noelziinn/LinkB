@@ -136,3 +136,14 @@
 .link-btn:hover {
   text-decoration: underline;
 }
+
+/* Garante que o atributo hidden sempre esconda o elemento */
+[hidden] {
+  display: none !important;
+}
+
+.forgot {
+  align-self: flex-start;
+  font-size: 0.85rem;
+  font-weight: 500;
+}

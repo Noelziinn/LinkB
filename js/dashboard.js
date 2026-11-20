@@ -5,6 +5,8 @@ let profile = null;
 let links = [];
 let editingId = null;
 
+const MAX_LINKS = 30; // mantenha igual ao limite do limits.sql
+
 // ===== Utilidades =====
 function showMsg(el, text, type = "success") {
   el.textContent = text;
@@ -214,6 +216,15 @@ $("link-form").addEventListener("submit", async (e) => {
 
   if (!title) return showMsg(msg, "Dê um título ao link.", "error");
   if (!url) return showMsg(msg, "O endereço do link não é válido.", "error");
+  if (url.length > 2000)
+    return showMsg(msg, "O endereço do link é muito longo.", "error");
+  if (!editingId && links.length >= MAX_LINKS) {
+    return showMsg(
+      msg,
+      `Você chegou ao limite de ${MAX_LINKS} links. Exclua algum para adicionar outro.`,
+      "error",
+    );
+  }
 
   const payload = {
     title,
@@ -241,6 +252,13 @@ $("link-form").addEventListener("submit", async (e) => {
 
   if (error) {
     console.error(error);
+    if ((error.message || "").includes("LINK_LIMIT_REACHED")) {
+      return showMsg(
+        msg,
+        `Você chegou ao limite de ${MAX_LINKS} links.`,
+        "error",
+      );
+    }
     return showMsg(
       msg,
       "Não foi possível salvar o link. Tente de novo.",

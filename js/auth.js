@@ -10,6 +10,7 @@ const submitBtn = document.getElementById("submit-btn");
 const toggleText = document.getElementById("toggle-text");
 const toggleBtn = document.getElementById("toggle-btn");
 const messageBox = document.getElementById("message");
+const forgotBtn = document.getElementById("forgot-btn");
 
 let mode = "login"; // "login" | "signup"
 
@@ -90,6 +91,7 @@ function setMode(newMode) {
     ? "Escolha seu usuário e monte seu link na bio."
     : "Acesse seu painel para editar seus links.";
   usernameField.hidden = !isSignup;
+  forgotBtn.hidden = isSignup;
   usernameInput.required = isSignup;
   passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
   toggleText.textContent = isSignup ? "Já tem conta?" : "Ainda não tem conta?";
@@ -173,6 +175,38 @@ form.addEventListener("submit", async (e) => {
   } finally {
     setLoading(false);
   }
+});
+
+// ===== Esqueci minha senha =====
+forgotBtn.addEventListener("click", async () => {
+  clearMessage();
+  const email = emailInput.value.trim();
+
+  if (!email) {
+    showMessage(
+      'Digite seu e-mail acima e clique de novo em "Esqueci minha senha".',
+    );
+    emailInput.focus();
+    return;
+  }
+
+  forgotBtn.disabled = true;
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: new URL("reset-password.html", location.href).href,
+  });
+  forgotBtn.disabled = false;
+
+  if (error) {
+    console.error(error);
+    showMessage(translateError(error));
+    return;
+  }
+
+  // Mesma resposta exista a conta ou não (não revela quem tem cadastro)
+  showMessage(
+    "Se existir uma conta com esse e-mail, enviamos um link para redefinir a senha. Confira também o spam.",
+    "success",
+  );
 });
 
 // ===== Se já estiver logado, vai direto pro painel =====

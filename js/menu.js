@@ -46,7 +46,14 @@
   const nav = el("nav", "menu-nav");
   panel.append(head, userBox, nav);
 
-  document.body.append(toggle, overlay, panel);
+  const brand = el("a", "brand");
+  brand.href = "index.html";
+  const logo = el("img", "brand-logo");
+  logo.src = "logo.png"; // coloque o arquivo na raiz do projeto
+  logo.alt = "";
+  brand.append(logo, el("span", "", "LinkB"));
+
+  document.body.append(brand, toggle, overlay, panel);
 
   // ===== Abrir e fechar =====
   function openMenu() {

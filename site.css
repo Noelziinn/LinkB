@@ -245,3 +245,30 @@ body.menu-open {
     transition: none;
   }
 }
+
+.brand {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 70px; /* 16px da borda + 44px do botão + 10px de espaço */
+  z-index: 30;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.brand-logo {
+  height: 24px; /* tamanho da logo: aumente ou diminua aqui */
+  width: auto; /* mantém a proporção */
+  display: block;
+}
