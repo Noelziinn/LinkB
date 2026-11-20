@@ -3,84 +3,137 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-    <title>Noel | Desenvolvedor & Projetos</title>
+    <title>LinkB | Todos os seus links em uma página só</title>
     <meta
       name="description"
-      content="Desenvolvedor Web • Criação de Sites, Sistemas & Projetos Digitais"
+      content="Crie sua página de links na bio em minutos. Um único link para compartilhar tudo o que você faz."
     />
-    <meta property="og:title" content="Noel | Desenvolvedor & Projetos" />
+    <meta
+      property="og:title"
+      content="LinkB | Todos os seus links em uma página só"
+    />
     <meta
       property="og:description"
-      content="Desenvolvedor Web • Criação de Sites, Sistemas & Projetos Digitais"
+      content="Crie sua página de links na bio em minutos. Um único link para compartilhar tudo o que você faz."
     />
-    <!-- Quando hospedar, adicione: <meta property="og:image" content="https://seusite.com/foto.jpg"> -->
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="site.css" />
-    <!-- Ícones leves do Phosphor Icons -->
+    <link rel="stylesheet" href="landing.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
   </head>
-  <body>
-    <main class="container">
-      <!-- Cabeçalho / Perfil -->
-      <header class="profile">
-        <div class="avatar-wrapper">
-          <!-- Troque o link abaixo pelo caminho da sua foto (ex: ./foto.jpg) -->
-          <img
-            src="https://github.com/identicons/jasonlong.png"
-            alt="Foto de Perfil"
-            class="avatar"
-          />
-          <span class="status-dot" title="Disponível para projetos"></span>
-        </div>
-        <h1>Noel</h1>
-        <p class="bio">
-          Desenvolvedor Web • Criação de Sites, Sistemas & Projetos Digitais
-        </p>
-      </header>
-
-      <!-- Botão Principal em Destaque -->
-      <section class="links">
-        <a
-          href="#"
-          class="link-card featured"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <i class="ph ph-rocket-launch"></i>
-          <div class="link-text">
-            <strong>Solicitar Orçamento</strong>
-            <span>Sites, landing pages e soluções sob medida</span>
+  <body class="landing">
+    <main class="lp">
+      <!-- Topo -->
+      <section class="hero">
+        <div class="hero-text">
+          <span class="pill">Link na bio grátis</span>
+          <h1>
+            Todos os seus links <span class="grad">em uma página só.</span>
+          </h1>
+          <p class="lead">
+            Crie a sua página em minutos e compartilhe um único endereço com
+            tudo o que você faz: portfólio, redes, loja, contato.
+          </p>
+          <div class="cta-row">
+            <a class="btn-cta primary cta-main" href="login.html#cadastro"
+              >Criar minha página</a
+            >
+            <a class="btn-cta ghost cta-second" href="login.html"
+              >Já tenho conta</a
+            >
           </div>
-          <i class="ph ph-arrow-up-right arrow"></i>
-        </a>
+          <p class="hint cta-hint">Sem cartão. Leva menos de um minuto.</p>
+        </div>
 
-        <!-- Demais Links -->
-        <a href="#" class="link-card" target="_blank" rel="noopener noreferrer">
-          <i class="ph ph-briefcase"></i>
-          <span>Meu Portfólio</span>
-          <i class="ph ph-arrow-up-right arrow"></i>
-        </a>
+        <!-- Exemplo ilustrativo de uma página criada no LinkB -->
+        <div class="hero-demo">
+          <div
+            class="phone"
+            role="img"
+            aria-label="Exemplo de uma página do LinkB com três links"
+          >
+            <div class="demo-avatar">S</div>
+            <div class="demo-name">Seu Nome</div>
+            <div class="demo-handle">/seunome</div>
 
-        <a href="#" class="link-card" target="_blank" rel="noopener noreferrer">
-          <i class="ph ph-robot"></i>
-          <span>NStore • Sistemas & Automação</span>
-          <i class="ph ph-arrow-up-right arrow"></i>
-        </a>
+            <div class="link-card featured">
+              <i class="ph ph-rocket-launch"></i>
+              <div class="link-text">
+                <strong>Meu portfólio</strong>
+                <span>Veja meus trabalhos</span>
+              </div>
+              <i class="ph ph-arrow-up-right arrow"></i>
+            </div>
 
-        <a href="#" class="link-card" target="_blank" rel="noopener noreferrer">
-          <i class="ph ph-github-logo"></i>
-          <span>GitHub</span>
-          <i class="ph ph-arrow-up-right arrow"></i>
-        </a>
+            <div class="link-card">
+              <i class="ph ph-instagram-logo"></i>
+              <span>Instagram</span>
+              <i class="ph ph-arrow-up-right arrow"></i>
+            </div>
+
+            <div class="link-card">
+              <i class="ph ph-whatsapp-logo"></i>
+              <span>Fale comigo no WhatsApp</span>
+              <i class="ph ph-arrow-up-right arrow"></i>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <p class="footer1">&copy; Noel Scott - All rights reserved!</p>
+      <!-- Motivos -->
+      <section class="features" aria-label="Vantagens">
+        <article class="feature">
+          <i class="ph ph-lightning"></i>
+          <h3>Pronta em minutos</h3>
+          <p>
+            Crie a conta, escolha seu nome de usuário e adicione seus links. Sem
+            programar, sem complicação.
+          </p>
+        </article>
+        <article class="feature">
+          <i class="ph ph-palette"></i>
+          <h3>Com a sua cara</h3>
+          <p>
+            Escolha a cor de destaque, ponha foto e bio, destaque o link mais
+            importante e organize a ordem como quiser.
+          </p>
+        </article>
+        <article class="feature">
+          <i class="ph ph-shield-check"></i>
+          <h3>Você no controle</h3>
+          <p>
+            Oculte um link sem apagar, edite quando quiser e exclua a sua conta
+            a qualquer momento.
+          </p>
+        </article>
+      </section>
+
+      <!-- Convite final -->
+      <section class="final-cta">
+        <h2>Pronto para ter a sua?</h2>
+        <p>
+          Seu endereço fica no formato <strong>/seunome</strong>, fácil de
+          colocar na bio de qualquer rede.
+        </p>
+        <a class="btn-cta primary cta-main" href="login.html#cadastro"
+          >Criar minha página</a
+        >
+      </section>
+
+      <!-- Rodapé -->
+      <footer class="lp-footer">
+        <p class="footer-links">
+          <a href="termos.html">Termos</a>
+          <a href="privacidade.html">Privacidade</a>
+        </p>
+        <p class="footer1">&copy; Noel Scott - All rights reserved!</p>
+      </footer>
     </main>
 
-    <!-- Menu lateral (os três pontinhos são criados pelo menu.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
     <script src="js/supabase.js"></script>
     <script src="js/menu.js"></script>
+    <script src="js/landing.js"></script>
   </body>
 </html>
