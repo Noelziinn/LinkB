@@ -1,0 +1,222 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg-dark: #09090b;
+  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-hover: rgba(255, 255, 255, 0.09);
+  --accent: #485ae8; /* Indigo/Roxo moderno - mude se quiser */
+  --accent-glow: rgba(36, 164, 223, 0.25);
+  --text-main: #fafafa;
+  --text-muted: #a1a1aa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 16px;
+  /* Luz ambiente suave no fundo */
+  background-image:
+    radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 55%),
+    radial-gradient(
+      circle at 85% 90%,
+      rgba(16, 126, 185, 0.1) 0%,
+      transparent 45%
+    );
+}
+
+.container {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Perfil */
+.profile {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: 4px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--card-border);
+  box-shadow: 0 0 25px var(--accent-glow);
+}
+
+.status-dot {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  background-color: #10b981;
+  border: 3px solid var(--bg-dark);
+  border-radius: 50%;
+}
+
+.profile h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.bio {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* Lista de Links */
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+}
+
+.link-card i {
+  font-size: 1.35rem;
+  color: var(--text-muted);
+  transition: color 0.25s ease;
+}
+
+.link-card span {
+  flex: 1;
+}
+
+.link-card .arrow {
+  font-size: 1.1rem;
+  opacity: 0.5;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.link-card:hover {
+  background: var(--card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.link-card:hover i {
+  color: var(--text-main);
+}
+
+.link-card:hover .arrow {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}
+
+/* Card Principal em Destaque */
+.link-card.featured {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 196, 241, 0.18),
+    rgba(99, 191, 241, 0.05)
+  );
+  border-color: rgba(99, 179, 241, 0.4);
+}
+
+.link-card.featured > i:first-child {
+  color: #818cf8;
+}
+
+.link-card.featured:hover {
+  border-color: #818cf8;
+  box-shadow: 0 8px 24px -6px var(--accent-glow);
+}
+
+.link-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.link-text strong {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.link-text span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Rodapé Social */
+.socials {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.socials a {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.socials a:hover {
+  color: var(--text-main);
+  background: var(--card-hover);
+  transform: translateY(-2px);
+}
+
+.footer1 {
+  padding: 15px 15px 8px 15px;
+  opacity: 70%;
+  font-size: 0.7em;
+  text-align: center;
+}

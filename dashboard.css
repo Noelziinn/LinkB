@@ -1,0 +1,244 @@
+/* Painel: complementa style.css e auth.css */
+
+body.dash {
+  align-items: flex-start;
+}
+
+.container.wide {
+  max-width: 560px;
+  gap: 20px;
+  padding-bottom: 32px;
+}
+
+.container[hidden] {
+  display: none;
+}
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dash-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dash-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+}
+
+.panel h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field textarea,
+.field select {
+  padding: 13px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.field select option {
+  background: #18181b;
+  color: var(--text-main);
+}
+
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.field input[type="color"] {
+  width: 64px;
+  height: 44px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row .btn-primary {
+  flex: 1;
+}
+
+/* Botões secundários */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: var(--card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
+}
+
+.btn-ghost.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Lista de links */
+.link-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+}
+
+.link-item.inactive {
+  opacity: 0.55;
+}
+
+.link-item.editing {
+  border-color: var(--accent);
+}
+
+.link-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.link-main > i {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+}
+
+.link-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.link-info strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-info small {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  margin-left: auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.18);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.link-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.link-tools .btn-ghost {
+  padding: 8px 12px;
+}
+
+.link-tools .check {
+  margin-left: auto;
+  font-size: 0.8rem;
+}
+
+.empty {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel | Noel</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="auth.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  </head>
+  <body class="dash">
+    <main class="container wide" id="app" hidden>
+      <header class="dash-header">
+        <div>
+          <h1>Painel</h1>
+          <p class="bio" id="who"></p>
+        </div>
+        <div class="dash-actions">
+          <a
+            id="public-link"
+            class="btn-ghost"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Ver minha página</a
+          >
+          <button id="logout-btn" type="button" class="btn-ghost">Sair</button>
+        </div>
+      </header>
+
+      <!-- PERFIL -->
+      <section class="panel">
+        <h2>Perfil</h2>
+        <form id="profile-form" novalidate>
+          <div class="field">
+            <label for="display_name">Nome</label>
+            <input
+              id="display_name"
+              type="text"
+              maxlength="60"
+              placeholder="Seu nome"
+            />
+          </div>
+          <div class="field">
+            <label for="bio">Bio</label>
+            <textarea
+              id="bio"
+              maxlength="160"
+              rows="3"
+              placeholder="Fale em uma frase o que você faz"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="avatar_url">Link da foto de perfil</label>
+            <input id="avatar_url" type="url" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <label for="accent_color">Cor de destaque</label>
+            <input id="accent_color" type="color" value="#6366f1" />
+          </div>
+          <p id="profile-msg" class="message" role="status" hidden></p>
+          <button type="submit" class="btn-primary" id="profile-btn">
+            Salvar perfil
+          </button>
+        </form>
+      </section>
+
+      <!-- LINKS -->
+      <section class="panel">
+        <h2 id="link-form-title">Adicionar link</h2>
+        <form id="link-form" novalidate>
+          <div class="field">
+            <label for="link-title">Título</label>
+            <input
+              id="link-title"
+              type="text"
+              maxlength="60"
+              placeholder="Meu portfólio"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="link-subtitle">Descrição (opcional)</label>
+            <input
+              id="link-subtitle"
+              type="text"
+              maxlength="80"
+              placeholder="Uma linha sobre o link"
+            />
+          </div>
+          <div class="field">
+            <label for="link-url">Endereço do link</label>
+            <input
+              id="link-url"
+              type="text"
+              inputmode="url"
+              placeholder="https://seusite.com"
+              required
+            />
+          </div>
+          <div class="field">
+            <label for="link-icon">Ícone</label>
+            <select id="link-icon">
+              <option value="ph-link">Link</option>
+              <option value="ph-globe">Site</option>
+              <option value="ph-briefcase">Portfólio</option>
+              <option value="ph-rocket-launch">Foguete</option>
+              <option value="ph-robot">Robô</option>
+              <option value="ph-shopping-cart">Loja</option>
+              <option value="ph-envelope">E-mail</option>
+              <option value="ph-github-logo">GitHub</option>
+              <option value="ph-instagram-logo">Instagram</option>
+              <option value="ph-whatsapp-logo">WhatsApp</option>
+              <option value="ph-discord-logo">Discord</option>
+              <option value="ph-youtube-logo">YouTube</option>
+            </select>
+          </div>
+          <label class="check">
+            <input id="link-featured" type="checkbox" />
+            <span>Destacar este link</span>
+          </label>
+          <p id="link-msg" class="message" role="status" hidden></p>
+          <div class="row">
+            <button type="submit" class="btn-primary" id="link-btn">
+              Adicionar link
+            </button>
+            <button type="button" class="btn-ghost" id="link-cancel" hidden>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Seus links</h2>
+        <ul id="link-list" class="link-list"></ul>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+/* Página pública: carregue depois do style.css.
+   A cor de destaque vem de --accent, definida pelo public.js */
+
+[hidden] {
+  display: none !important;
+}
+
+.state {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.state a {
+  color: var(--text-main);
+}
+
+/* Avatar sem foto: mostra a inicial do nome */
+.avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 25%, #18181b);
+  border: 2px solid var(--card-border);
+  box-shadow: 0 0 25px var(--accent-glow);
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+/* Destaque usando a cor do usuário */
+.link-card.featured {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--accent) 5%, transparent)
+  );
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.link-card.featured > i:first-child {
+  color: color-mix(in srgb, var(--accent) 60%, white);
+}
+
+.link-card.featured:hover {
+  border-color: color-mix(in srgb, var(--accent) 70%, white);
+}
+
+/* Links com descrição usam o bloco de texto em duas linhas */
+.link-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, white);
+  outline-offset: 3px;
+}
+
+.made-with {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.made-with a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.made-with a:hover {
+  color: var(--text-main);
+}

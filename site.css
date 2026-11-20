@@ -1,0 +1,247 @@
+/* Elementos compartilhados entre as páginas: menu lateral e rodapé.
+   Usa as variáveis do style.css */
+
+/* ===== Rodapé ===== */
+.footer1 {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #71717a;
+  padding-top: 4px;
+}
+
+/* ===== Botão dos três pontinhos ===== */
+.menu-toggle {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.menu-toggle:hover {
+  color: var(--text-main);
+  background: var(--card-hover);
+}
+
+.menu-toggle:focus-visible,
+.menu-close:focus-visible,
+.menu-item:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
+}
+
+/* ===== Fundo escurecido ===== */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== Barra lateral ===== */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 50;
+  width: min(320px, 86vw);
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 20px;
+  background: #111113;
+  border-left: 1px solid var(--card-border);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.side-menu.open {
+  transform: translateX(0);
+  visibility: visible;
+  transition:
+    transform 0.25s ease,
+    visibility 0s;
+}
+
+.menu-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.menu-close {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.menu-close:hover {
+  color: var(--text-main);
+  background: var(--card-hover);
+}
+
+/* ===== Perfil dentro do menu ===== */
+.menu-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  min-width: 0;
+}
+
+.menu-avatar {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--card-border);
+}
+
+.menu-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.25);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.menu-user-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.menu-user-text strong {
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-user-text span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-hint {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* ===== Itens do menu ===== */
+.menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.menu-item i {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.menu-item:hover {
+  background: var(--card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-item.primary {
+  background: var(--accent);
+  border-color: transparent;
+}
+
+.menu-item.primary i {
+  color: #fff;
+}
+
+.menu-item.primary:hover {
+  filter: brightness(1.1);
+}
+
+.menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.menu-spacer {
+  flex: 1;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side-menu,
+  .side-menu.open,
+  .menu-overlay {
+    transition: none;
+  }
+}

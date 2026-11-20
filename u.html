@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carregando...</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="public.css" />
+    <link rel="stylesheet" href="site.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  </head>
+  <body>
+    <main class="container">
+      <p id="state" class="state" role="status">Carregando...</p>
+
+      <header class="profile" id="profile" hidden>
+        <div class="avatar-wrapper" id="avatar-wrapper"></div>
+        <h1 id="name"></h1>
+        <p class="bio" id="bio"></p>
+      </header>
+
+      <section class="links" id="links" hidden></section>
+
+      <p class="made-with" id="made-with" hidden>
+        <a href="index.html">Crie seu link na bio</a>
+      </p>
+
+      <p class="footer1">&copy; Noel Scott - All rights reserved!</p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/public.js"></script>
+  </body>
+</html>
