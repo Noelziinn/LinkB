@@ -268,7 +268,7 @@ body.menu-open {
 }
 
 .brand-logo {
-  height: 24px; /* tamanho da logo: aumente ou diminua aqui */
+  height: 32px; /* tamanho da logo: aumente ou diminua aqui */
   width: auto; /* mantém a proporção */
   display: block;
 }
