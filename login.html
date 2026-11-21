@@ -8,64 +8,97 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="site.css" />
     <link rel="stylesheet" href="auth.css" />
+    <link rel="stylesheet" href="login.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
   </head>
   <body>
-    <main class="container">
-      <a class="brand brand-center brand-lg" href="index.html">
-        <img class="brand-logo" src="logo.png" alt="" />
-        <span class="brand-name">LinkB</span>
-      </a>
+    <main class="auth-page">
+      <!-- Lado esquerdo (só em telas grandes) -->
+      <section class="auth-aside">
+        <a class="brand brand-lg" href="index.html">
+          <img class="brand-logo" src="logo.png" alt="" />
+          <span class="brand-name">LinkB</span>
+        </a>
+        <h2>
+          Sua página de links, <span class="grad">pronta em minutos.</span>
+        </h2>
+        <ul class="aside-list">
+          <li>
+            <i class="ph ph-check-circle"></i
+            ><span>Um único endereço para tudo o que você faz.</span>
+          </li>
+          <li>
+            <i class="ph ph-check-circle"></i
+            ><span>Cor, foto, bio e ordem dos links do seu jeito.</span>
+          </li>
+          <li>
+            <i class="ph ph-check-circle"></i
+            ><span>Gratuito e sem cartão.</span>
+          </li>
+        </ul>
+      </section>
 
-      <section class="auth-card">
-        <h1 id="auth-title">Entrar</h1>
-        <p id="auth-subtitle" class="bio">
-          Acesse seu painel para editar seus links.
-        </p>
+      <div class="auth-main">
+        <!-- Logo no celular -->
+        <a
+          class="brand brand-center brand-lg auth-brand-mobile"
+          href="index.html"
+        >
+          <img class="brand-logo" src="logo.png" alt="" />
+          <span class="brand-name">LinkB</span>
+        </a>
 
-        <form id="auth-form" novalidate>
-          <div class="field" id="username-field" hidden>
-            <label for="username">Nome de usuário</label>
-            <input
-              id="username"
-              type="text"
-              autocomplete="username"
-              placeholder="seunome"
-              maxlength="30"
-            />
-            <small>Sua página ficará em /seunome</small>
+        <section class="auth-card">
+          <div class="tabs">
+            <button
+              type="button"
+              id="tab-login"
+              class="tab active"
+              aria-pressed="true"
+            >
+              Entrar
+            </button>
+            <button
+              type="button"
+              id="tab-signup"
+              class="tab"
+              aria-pressed="false"
+            >
+              Criar conta
+            </button>
           </div>
 
-          <div class="field">
-            <label for="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              autocomplete="email"
-              placeholder="voce@email.com"
-              required
-            />
+          <div>
+            <h1 id="auth-title">Bem-vindo de volta</h1>
+            <p id="auth-subtitle" class="bio">
+              Acesse seu painel para editar seus links.
+            </p>
           </div>
 
-          <div class="field">
-            <label for="password">Senha</label>
-            <input
-              id="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="Mínimo de 6 caracteres"
-              minlength="6"
-              required
-            />
-          </div>
-
-          <button id="forgot-btn" type="button" class="link-btn forgot">
-            Esqueci minha senha
-          </button>
-
-          <label class="check" id="terms-field" hidden>
-            <input id="terms" type="checkbox" />
-            <span>
-              Li e concordo com os
+          <!-- Entrar com Google / GitHub (só aparece o que estiver em ENABLED_PROVIDERS) -->
+          <div class="social-box" id="social-box" hidden>
+            <div class="social">
+              <button
+                type="button"
+                class="btn-social"
+                data-provider="google"
+                hidden
+              >
+                <i class="ph ph-google-logo"></i
+                ><span>Continuar com Google</span>
+              </button>
+              <button
+                type="button"
+                class="btn-social"
+                data-provider="github"
+                hidden
+              >
+                <i class="ph ph-github-logo"></i
+                ><span>Continuar com GitHub</span>
+              </button>
+            </div>
+            <p class="social-note">
+              Ao continuar, você aceita os
               <a href="termos.html" target="_blank" rel="noopener noreferrer"
                 >Termos de Uso</a
               >
@@ -76,26 +109,89 @@
                 rel="noopener noreferrer"
                 >Política de Privacidade</a
               >.
-            </span>
-          </label>
+            </p>
+            <div class="divider"><span>ou com e-mail</span></div>
+          </div>
 
-          <!-- Verificação anti-robô (só aparece se a chave estiver no config.js) -->
-          <div id="captcha"></div>
+          <form id="auth-form" novalidate>
+            <div class="field" id="username-field" hidden>
+              <label for="username">Nome de usuário</label>
+              <input
+                id="username"
+                type="text"
+                autocomplete="username"
+                placeholder="seunome"
+                maxlength="30"
+              />
+              <small>Sua página ficará em /seunome</small>
+            </div>
 
-          <p id="message" class="message" role="alert" hidden></p>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input
+                id="email"
+                type="email"
+                autocomplete="email"
+                placeholder="voce@email.com"
+                required
+              />
+            </div>
 
-          <button id="submit-btn" type="submit" class="btn-primary">
-            Entrar
-          </button>
-        </form>
+            <div class="field">
+              <label for="password">Senha</label>
+              <div class="pw-wrap">
+                <input
+                  id="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Mínimo de 6 caracteres"
+                  minlength="6"
+                  required
+                />
+                <button
+                  type="button"
+                  id="pw-toggle"
+                  class="pw-toggle"
+                  aria-label="Mostrar senha"
+                  aria-pressed="false"
+                >
+                  <i class="ph ph-eye"></i>
+                </button>
+              </div>
+            </div>
 
-        <p class="toggle">
-          <span id="toggle-text">Ainda não tem conta?</span>
-          <button id="toggle-btn" type="button" class="link-btn">
-            Criar conta
-          </button>
-        </p>
-      </section>
+            <button id="forgot-btn" type="button" class="link-btn forgot">
+              Esqueci minha senha
+            </button>
+
+            <label class="check" id="terms-field" hidden>
+              <input id="terms" type="checkbox" />
+              <span>
+                Li e concordo com os
+                <a href="termos.html" target="_blank" rel="noopener noreferrer"
+                  >Termos de Uso</a
+                >
+                e a
+                <a
+                  href="privacidade.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >Política de Privacidade</a
+                >.
+              </span>
+            </label>
+
+            <!-- Verificação anti-robô (só aparece se a chave estiver no config.js) -->
+            <div id="captcha"></div>
+
+            <p id="message" class="message" role="alert" hidden></p>
+
+            <button id="submit-btn" type="submit" class="btn-primary">
+              Entrar
+            </button>
+          </form>
+        </section>
+      </div>
     </main>
 
     <!-- Biblioteca do Supabase (versão fixa) -->

@@ -7,42 +7,27 @@ const usernameInput = document.getElementById("username");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const submitBtn = document.getElementById("submit-btn");
-const toggleText = document.getElementById("toggle-text");
-const toggleBtn = document.getElementById("toggle-btn");
+const tabLogin = document.getElementById("tab-login");
+const tabSignup = document.getElementById("tab-signup");
 const messageBox = document.getElementById("message");
 const forgotBtn = document.getElementById("forgot-btn");
 const termsField = document.getElementById("terms-field");
 const termsInput = document.getElementById("terms");
+const socialBox = document.getElementById("social-box");
+const pwToggle = document.getElementById("pw-toggle");
 
 let mode = "login"; // "login" | "signup"
 
-// Nomes que conflitam com páginas do site (mantenha igual ao reserved-usernames.sql)
-const RESERVED_USERNAMES = [
-  "login",
-  "dashboard",
-  "u",
-  "index",
-  "admin",
-  "api",
-  "js",
-  "css",
-  "assets",
-  "style",
-  "auth",
-  "signup",
-  "cadastro",
-  "settings",
-  "privacy",
-  "terms",
-  "about",
-  "sobre",
-  "suporte",
-  "support",
-  "www",
-  "app",
-  "public",
-  "site",
-];
+const PROVIDER_LABELS = { google: "Google", github: "GitHub" };
+
+// Estes valores vêm do config.js (com proteção caso ainda não existam lá)
+const enabledProviders = () =>
+  typeof ENABLED_PROVIDERS !== "undefined" ? ENABLED_PROVIDERS : [];
+const isReserved = (name) =>
+  (typeof RESERVED_USERNAMES !== "undefined"
+    ? RESERVED_USERNAMES
+    : []
+  ).includes(name);
 
 // ===== CAPTCHA (Cloudflare Turnstile) =====
 let captchaToken = null;
@@ -104,6 +89,8 @@ function translateError(error) {
     return "Confirme seu e-mail antes de entrar.";
   if (msg.includes("password should be at least"))
     return "A senha precisa ter pelo menos 6 caracteres.";
+  if (msg.includes("signups not allowed"))
+    return "Os cadastros estão temporariamente fechados.";
   if (msg.includes("captcha"))
     return "Não foi possível verificar que você não é um robô. Tente de novo.";
   if (msg.includes("rate limit"))
@@ -122,29 +109,32 @@ function captchaOk() {
   return true;
 }
 
-// ===== Alternar entre login e cadastro =====
+// ===== Alternar entre login e cadastro (abas) =====
 function setMode(newMode) {
   mode = newMode;
   clearMessage();
 
   const isSignup = mode === "signup";
-  title.textContent = isSignup ? "Crie sua página" : "Entrar";
+  title.textContent = isSignup ? "Crie sua página" : "Bem-vindo de volta";
   subtitle.textContent = isSignup
     ? "Escolha seu usuário e monte seu link na bio."
     : "Acesse seu painel para editar seus links.";
+
+  tabLogin.classList.toggle("active", !isSignup);
+  tabSignup.classList.toggle("active", isSignup);
+  tabLogin.setAttribute("aria-pressed", String(!isSignup));
+  tabSignup.setAttribute("aria-pressed", String(isSignup));
+
   usernameField.hidden = !isSignup;
   usernameInput.required = isSignup;
   forgotBtn.hidden = isSignup;
   termsField.hidden = !isSignup;
   passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
-  toggleText.textContent = isSignup ? "Já tem conta?" : "Ainda não tem conta?";
-  toggleBtn.textContent = isSignup ? "Entrar" : "Criar conta";
   setLoading(false);
 }
 
-toggleBtn.addEventListener("click", () => {
-  setMode(mode === "login" ? "signup" : "login");
-});
+tabLogin.addEventListener("click", () => setMode("login"));
+tabSignup.addEventListener("click", () => setMode("signup"));
 
 // Abre direto no cadastro com login.html#cadastro
 if (location.hash === "#cadastro") setMode("signup");
@@ -154,7 +144,48 @@ if (new URLSearchParams(location.search).get("conta") === "excluida") {
   showMessage("Sua conta foi excluída com sucesso.", "success");
 }
 
-// ===== Envio do formulário =====
+// ===== Mostrar / ocultar senha =====
+pwToggle.addEventListener("click", () => {
+  const show = passwordInput.type === "password";
+  passwordInput.type = show ? "text" : "password";
+  pwToggle.setAttribute("aria-pressed", String(show));
+  pwToggle.setAttribute("aria-label", show ? "Ocultar senha" : "Mostrar senha");
+  pwToggle.firstElementChild.className =
+    "ph " + (show ? "ph-eye-slash" : "ph-eye");
+});
+
+// ===== Entrar com Google / GitHub =====
+async function signInWithProvider(provider, button) {
+  clearMessage();
+  button.disabled = true;
+
+  const { error } = await db.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: new URL("dashboard.html", location.href).href },
+  });
+
+  // Se deu certo, o navegador já está indo para a página do provedor
+  if (error) {
+    console.error(error);
+    showMessage(
+      `Não foi possível entrar com ${PROVIDER_LABELS[provider]}. Tente de novo.`,
+    );
+    button.disabled = false;
+  }
+}
+
+(function setupSocialButtons() {
+  const active = enabledProviders().filter((p) => PROVIDER_LABELS[p]);
+  document.querySelectorAll("[data-provider]").forEach((button) => {
+    button.hidden = !active.includes(button.dataset.provider);
+    button.addEventListener("click", () =>
+      signInWithProvider(button.dataset.provider, button),
+    );
+  });
+  socialBox.hidden = active.length === 0;
+})();
+
+// ===== Envio do formulário (e-mail e senha) =====
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearMessage();
@@ -185,7 +216,7 @@ form.addEventListener("submit", async (e) => {
         return;
       }
 
-      if (RESERVED_USERNAMES.includes(username)) {
+      if (isReserved(username)) {
         showMessage("Esse nome de usuário não está disponível.");
         return;
       }

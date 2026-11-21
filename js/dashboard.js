@@ -41,7 +41,7 @@ async function init() {
   }
   currentUser = data.session.user;
 
-  await loadProfile();
+  if ((await loadProfile()) === false) return;
   await loadLinks();
   $("app").hidden = false;
 }
@@ -58,6 +58,12 @@ async function loadProfile() {
     console.error(error);
     alert("Não foi possível carregar seu perfil. Tente entrar de novo.");
     return logout();
+  }
+
+  // Conta criada por Google/GitHub ainda sem nome de usuário escolhido
+  if (data.username_set === false) {
+    window.location.href = "escolher-usuario.html";
+    return false;
   }
 
   profile = data;

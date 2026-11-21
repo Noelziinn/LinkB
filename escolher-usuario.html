@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escolha seu usuário | LinkB</title>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="site.css" />
+    <link rel="stylesheet" href="auth.css" />
+  </head>
+  <body>
+    <main class="container" id="app" hidden>
+      <a class="brand brand-center brand-lg" href="index.html">
+        <img class="brand-logo" src="logo.png" alt="" />
+        <span class="brand-name">LinkB</span>
+      </a>
+
+      <section class="auth-card">
+        <h1>Escolha seu usuário</h1>
+        <p class="bio">
+          Esse nome vira o endereço da sua página. Você só faz isso uma vez.
+        </p>
+
+        <form id="username-form" novalidate>
+          <div class="field">
+            <label for="username">Nome de usuário</label>
+            <input
+              id="username"
+              type="text"
+              autocomplete="off"
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="seunome"
+              maxlength="30"
+              required
+            />
+            <small
+              >De 3 a 30 caracteres: letras minúsculas, números e _. Sua página
+              ficará em /seunome</small
+            >
+          </div>
+
+          <label class="check">
+            <input id="terms" type="checkbox" />
+            <span>
+              Li e concordo com os
+              <a href="termos.html" target="_blank" rel="noopener noreferrer"
+                >Termos de Uso</a
+              >
+              e a
+              <a
+                href="privacidade.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Política de Privacidade</a
+              >.
+            </span>
+          </label>
+
+          <p id="message" class="message" role="alert" hidden></p>
+
+          <button id="submit-btn" type="submit" class="btn-primary">
+            Continuar
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/username.js"></script>
+  </body>
+</html>
