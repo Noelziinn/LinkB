@@ -31,7 +31,7 @@ body.dash .brand-top {
 }
 
 .dash-logo {
-  height: 40px;
+  height: 56px;
   width: auto;
   display: block;
 }
@@ -783,5 +783,17 @@ dialog.modal::backdrop {
 
   .name-input {
     font-size: 1.1rem;
+  }
+}
+
+/* mais respiro entre o cabeçalho e o perfil */
+.dash-header {
+  margin-bottom: 16px;
+}
+
+/* no computador, sobe o cabeçalho para perto do topo */
+@media (min-width: 760px) {
+  body.dash {
+    padding-top: 28px;
   }
 }
