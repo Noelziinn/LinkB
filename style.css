@@ -44,8 +44,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 28px;
-  margin-top: auto;
-  flex: 1;
 }
 
 /* Perfil */
@@ -224,4 +222,5 @@ body {
   opacity: 70%;
   font-size: 0.7em;
   text-align: center;
+  margin-top: auto;
 }
