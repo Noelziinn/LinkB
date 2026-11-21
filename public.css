@@ -33,20 +33,18 @@
 
 /* Destaque usando a cor do usuário */
 .link-card.featured {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 18%, transparent),
-    color-mix(in srgb, var(--accent) 5%, transparent)
-  );
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: var(--card-bg);
+  border-color: color-mix(in srgb, var(--accent) 75%, transparent);
+  box-shadow: 0 0 24px -4px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.link-card.featured:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 32px -2px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 .link-card.featured > i:first-child {
   color: color-mix(in srgb, var(--accent) 60%, white);
-}
-
-.link-card.featured:hover {
-  border-color: color-mix(in srgb, var(--accent) 70%, white);
 }
 
 /* Links com descrição usam o bloco de texto em duas linhas */

@@ -2,6 +2,12 @@ const $ = (id) => document.getElementById(id);
 
 const MAX_LINKS = 30; // mantenha igual ao limite do limits.sql
 
+// Fotos de perfil (Supabase Storage)
+const AVATAR_BUCKET = "avatars";
+const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const AVATAR_MAX_INPUT = 8 * 1024 * 1024; // imagem original aceita
+const AVATAR_SIZE = 512; // lado da foto depois de redimensionar
+
 // Ícones disponíveis: [classe do Phosphor, nome]
 const ICONS = [
   ["ph-link", "Link"],
@@ -37,9 +43,11 @@ const SCROLL = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 let currentUser = null;
 let profile = null; // linha do banco
 let profileBase = null; // últimos valores salvos (para saber se mudou)
-let pendingAvatar = null; // link da foto ainda não salvo
+let pendingAvatar = null; // foto escolhida, ainda não salva
+let unsavedUpload = null; // { path, url } de uma foto enviada e ainda não salva
 let cards = []; // cards de link, na ordem da tela
 let deleting = false;
+let drag = null; // estado do arrastar e soltar
 
 // ===== Utilidades =====
 function el(tag, cls, text) {
@@ -76,6 +84,13 @@ function flashStatus(box, text, kind = "ok", ms = 2200, after) {
       if (after) after();
     }
   }, ms);
+}
+
+// Aviso para leitores de tela
+function announce(text) {
+  const live = $("sr-live");
+  live.textContent = "";
+  setTimeout(() => (live.textContent = text), 50);
 }
 
 function normalizeUrl(value) {
@@ -211,15 +226,114 @@ $("display_name").addEventListener("input", () => {
 $("bio").addEventListener("input", updateProfileUI);
 $("accent_color").addEventListener("input", updateProfileUI);
 
+// ----- Arquivos de foto no Storage -----
+function storagePathFromUrl(url) {
+  const marker = `/storage/v1/object/public/${AVATAR_BUCKET}/`;
+  const i = (url || "").indexOf(marker);
+  if (i === -1) return null;
+  try {
+    const path = decodeURIComponent(url.slice(i + marker.length).split("?")[0]);
+    // só mexe em arquivos da própria pasta
+    return path.startsWith(currentUser.id + "/") ? path : null;
+  } catch {
+    return null;
+  }
+}
+
+async function removeStoredFile(path) {
+  if (!path) return;
+  const { error } = await db.storage.from(AVATAR_BUCKET).remove([path]);
+  if (error) console.error(error);
+}
+
+// Apaga a foto enviada que nunca chegou a ser salva no perfil
+async function dropUnsavedUpload() {
+  if (!unsavedUpload) return;
+  const { path } = unsavedUpload;
+  unsavedUpload = null;
+  await removeStoredFile(path);
+}
+
+// Apaga todas as fotos da pessoa (usado ao excluir a conta)
+async function deleteMyAvatarFiles() {
+  try {
+    const folder = db.storage.from(AVATAR_BUCKET);
+    const { data } = await folder.list(currentUser.id, { limit: 100 });
+    if (data && data.length) {
+      await folder.remove(data.map((f) => `${currentUser.id}/${f.name}`));
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("imagem"));
+    };
+    img.src = url;
+  });
+}
+
+// Recorta no centro, deixa quadrada e reduz (foto leve e igual para todo mundo)
+async function resizeToSquare(file) {
+  const img = await loadImage(file);
+  const side = Math.min(img.naturalWidth, img.naturalHeight);
+  const sx = (img.naturalWidth - side) / 2;
+  const sy = (img.naturalHeight - side) / 2;
+  const out = Math.min(AVATAR_SIZE, side);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = out;
+  canvas.height = out;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#18181b"; // fundo para imagens com transparência
+  ctx.fillRect(0, 0, out, out);
+  ctx.drawImage(img, sx, sy, side, side, 0, 0, out, out);
+
+  return new Promise((resolve, reject) =>
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("imagem"))),
+      "image/jpeg",
+      0.88,
+    ),
+  );
+}
+
+async function uploadAvatar(file) {
+  if (!AVATAR_TYPES.includes(file.type)) throw new Error("tipo");
+  if (file.size > AVATAR_MAX_INPUT) throw new Error("tamanho");
+
+  const blob = await resizeToSquare(file);
+  const path = `${currentUser.id}/${Date.now()}.jpg`;
+
+  const { error } = await db.storage.from(AVATAR_BUCKET).upload(path, blob, {
+    contentType: "image/jpeg",
+    cacheControl: "31536000",
+  });
+  if (error) throw error;
+
+  const { data } = db.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+  return { path, url: data.publicUrl };
+}
+
 // ----- Foto de perfil (menu ao clicar na imagem) -----
 const avatarPop = $("avatar-pop");
 
 function openAvatarPop() {
-  $("avatar-url").value = pendingAvatar || "";
+  $("avatar-url").value = unsavedUpload ? "" : pendingAvatar || "";
   setStatus($("avatar-msg"), "", "");
   avatarPop.hidden = false;
   $("avatar-btn").setAttribute("aria-expanded", "true");
-  $("avatar-url").focus();
+  $("avatar-upload").focus();
 }
 
 function closeAvatarPop(returnFocus = false) {
@@ -241,6 +355,43 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !avatarPop.hidden) closeAvatarPop(true);
 });
 
+$("avatar-upload").addEventListener("click", () => $("avatar-file").click());
+
+$("avatar-file").addEventListener("change", async () => {
+  const input = $("avatar-file");
+  const file = input.files[0];
+  input.value = "";
+  if (!file) return;
+
+  const msg = $("avatar-msg");
+  const btn = $("avatar-upload");
+  btn.disabled = true;
+  setStatus(msg, "Enviando...", "");
+
+  try {
+    const uploaded = await uploadAvatar(file);
+    await dropUnsavedUpload(); // descarta um envio anterior que não foi salvo
+    unsavedUpload = uploaded;
+    pendingAvatar = uploaded.url;
+    renderAvatar();
+    updateProfileUI();
+    closeAvatarPop(true);
+  } catch (err) {
+    console.error(err);
+    const text =
+      err.message === "tipo"
+        ? "Use uma imagem PNG, JPG ou WebP."
+        : err.message === "tamanho"
+          ? "A imagem é grande demais (máximo 8 MB)."
+          : err.message === "imagem"
+            ? "Não foi possível ler essa imagem."
+            : "Não foi possível enviar a imagem. Tente de novo.";
+    setStatus(msg, text, "error");
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 $("avatar-apply").addEventListener("click", () => {
   const raw = $("avatar-url").value.trim();
   const url = raw ? normalizeUrl(raw) : null;
@@ -248,6 +399,7 @@ $("avatar-apply").addEventListener("click", () => {
   if (raw && (!url || url.length > 2000)) {
     return setStatus($("avatar-msg"), "Esse link não é válido.", "error");
   }
+  if (url !== pendingAvatar) dropUnsavedUpload();
   pendingAvatar = url;
   renderAvatar();
   updateProfileUI();
@@ -262,6 +414,7 @@ $("avatar-url").addEventListener("keydown", (e) => {
 });
 
 $("avatar-remove").addEventListener("click", () => {
+  dropUnsavedUpload();
   pendingAvatar = null;
   renderAvatar();
   updateProfileUI();
@@ -272,6 +425,7 @@ $("avatar-remove").addEventListener("click", () => {
 $("profile-save").addEventListener("click", async () => {
   if (!profileDirty()) return;
   const values = readProfile();
+  const oldAvatar = profileBase.avatar_url;
   const status = $("profile-status");
 
   $("profile-save").disabled = true;
@@ -296,6 +450,12 @@ $("profile-save").addEventListener("click", async () => {
   }
 
   profileBase = values;
+  if (unsavedUpload && unsavedUpload.url === values.avatar_url)
+    unsavedUpload = null;
+  // a foto antiga (se estava no nosso Storage) já não é usada
+  if (oldAvatar && oldAvatar !== values.avatar_url)
+    removeStoredFile(storagePathFromUrl(oldAvatar));
+
   updateProfileUI();
   flashStatus(status, "Salvo", "ok");
 });
@@ -340,6 +500,7 @@ const normState = (s) =>
 
 const cardDirty = (c) => c.draft || normState(c.state) !== normState(c.base);
 const savedCards = () => cards.filter((c) => !c.draft);
+const cardOf = (node) => cards.find((c) => c.el === node);
 
 async function loadLinks() {
   const { data, error } = await db
@@ -357,8 +518,7 @@ async function loadLinks() {
 
   cards = data.map((l) => createCard(l));
   $("link-list").replaceChildren(...cards.map((c) => c.el));
-  cards.forEach(refresh);
-  refreshMoveButtons();
+  cards.forEach((c) => refresh(c));
   updateTotals();
   updateEmpty();
 }
@@ -403,6 +563,18 @@ function createCard(link) {
   const li = el("li", "lcard" + (card.draft ? " draft" : ""));
   card.el = li;
 
+  // Alça de arrastar
+  const handle = el("button", "drag-handle");
+  handle.type = "button";
+  handle.title = "Arraste para reordenar";
+  handle.setAttribute(
+    "aria-label",
+    "Reordenar link. Arraste, ou use as setas para cima e para baixo.",
+  );
+  handle.append(icon("ph-dots-six-vertical"));
+
+  const main = el("div", "lcard-main");
+
   // Campos
   const fields = el("div", "lcard-fields");
   const title = textInput(
@@ -444,21 +616,10 @@ function createCard(link) {
   const clicksText = el("span", "", plural(card.clicks));
   clicks.append(icon("ph-cursor-click"), clicksText);
 
-  const up = iconOnlyBtn("Mover para cima", "ph-arrow-up");
-  const down = iconOnlyBtn("Mover para baixo", "ph-arrow-down");
   const eye = iconOnlyBtn("Ocultar link", "ph-eye");
   const trash = iconOnlyBtn("Excluir link", "ph-trash", "danger");
 
-  tools.append(
-    iconBtn,
-    featBtn,
-    clicks,
-    el("span", "spacer"),
-    up.b,
-    down.b,
-    eye.b,
-    trash.b,
-  );
+  tools.append(iconBtn, featBtn, clicks, el("span", "spacer"), eye.b, trash.b);
 
   // Seletor de ícones
   const grid = el("div", "icon-grid");
@@ -487,9 +648,11 @@ function createCard(link) {
   save.type = "button";
   foot.append(status, save);
 
-  li.append(fields, tools, grid, foot);
+  main.append(fields, tools, grid, foot);
+  li.append(handle, main);
 
   card.refs = {
+    handle,
     title,
     url,
     subtitle,
@@ -500,8 +663,6 @@ function createCard(link) {
     featIcon,
     clicks,
     clicksText,
-    up: up.b,
-    down: down.b,
     eye: eye.b,
     eyeIcon: eye.i,
     trash: trash.b,
@@ -510,7 +671,7 @@ function createCard(link) {
     save,
   };
 
-  // Eventos
+  // Eventos dos campos
   title.addEventListener("input", () => {
     card.state.title = title.value;
     refresh(card);
@@ -542,11 +703,25 @@ function createCard(link) {
     card.state.featured = !card.state.featured;
     refresh(card);
   });
-  up.b.addEventListener("click", () => moveCard(card, -1));
-  down.b.addEventListener("click", () => moveCard(card, 1));
   eye.b.addEventListener("click", () => toggleActive(card));
   trash.b.addEventListener("click", () => removeCard(card));
   save.addEventListener("click", () => saveCard(card));
+
+  // Arrastar e soltar (mouse, toque e caneta) + setas do teclado na alça
+  handle.addEventListener("pointerdown", (e) => startDrag(card, e));
+  handle.addEventListener("pointermove", (e) => {
+    if (drag && drag.card === card) drag.y = e.clientY;
+  });
+  handle.addEventListener("pointerup", () => endDrag(card));
+  handle.addEventListener("pointercancel", () => endDrag(card));
+  handle.addEventListener("lostpointercapture", () => endDrag(card));
+  handle.addEventListener("keydown", (e) => {
+    if (card.draft) return;
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      moveCard(card, e.key === "ArrowUp" ? -1 : 1);
+    }
+  });
 
   refresh(card);
   return card;
@@ -582,7 +757,7 @@ function refresh(card) {
   r.clicksText.textContent = plural(card.clicks);
 
   // Rascunho ainda não tem posição, visibilidade nem cliques
-  [r.up, r.down, r.eye, r.clicks].forEach((x) => (x.hidden = card.draft));
+  [r.handle, r.eye, r.clicks].forEach((x) => (x.hidden = card.draft));
 
   r.save.hidden = !dirty;
   r.foot.hidden = !(dirty || r.status.textContent);
@@ -591,14 +766,6 @@ function refresh(card) {
 function cardFlash(card, text, kind, ms) {
   flashStatus(card.refs.status, text, kind, ms, () => refresh(card));
   refresh(card);
-}
-
-function refreshMoveButtons() {
-  const saved = savedCards();
-  saved.forEach((c, i) => {
-    c.refs.up.disabled = i === 0;
-    c.refs.down.disabled = i === saved.length - 1;
-  });
 }
 
 function updateTotals() {
@@ -632,7 +799,6 @@ $("add-link").addEventListener("click", () => {
   cards.push(card);
   $("link-list").append(card.el);
   updateEmpty();
-  refreshMoveButtons();
   card.el.scrollIntoView({ behavior: SCROLL, block: "center" });
   card.refs.title.focus();
 });
@@ -715,30 +881,12 @@ async function saveCard(card) {
   r.url.value = card.state.url;
   r.subtitle.value = card.state.subtitle;
 
-  refreshMoveButtons();
   updateTotals();
   cardFlash(card, "Salvo", "ok", 2200);
 }
 
-// ----- Mover, ocultar e excluir (acontecem na hora) -----
-async function moveCard(card, dir) {
-  const saved = savedCards();
-  const i = saved.indexOf(card);
-  const j = i + dir;
-  if (j < 0 || j >= saved.length) return;
-  const other = saved[j];
-
-  const parent = card.el.parentNode;
-  if (dir < 0) parent.insertBefore(card.el, other.el);
-  else parent.insertBefore(other.el, card.el);
-
-  const ci = cards.indexOf(card);
-  const oi = cards.indexOf(other);
-  [cards[ci], cards[oi]] = [cards[oi], cards[ci]];
-
-  refreshMoveButtons();
-  (dir < 0 ? card.refs.up : card.refs.down).focus();
-
+// ----- Ordem: arrastar e soltar -----
+async function persistOrder() {
   const results = await Promise.all(
     savedCards().map((c, idx) =>
       db.from("links").update({ position: idx }).eq("id", c.id),
@@ -753,6 +901,124 @@ async function moveCard(card, dir) {
   }
 }
 
+function announcePosition(card) {
+  const saved = savedCards();
+  const name = card.base ? card.base.title : "Link";
+  announce(
+    `${name} movido para a posição ${saved.indexOf(card) + 1} de ${saved.length}.`,
+  );
+}
+
+function startDrag(card, e) {
+  if (card.draft || drag || e.button > 0) return;
+  e.preventDefault();
+  card.refs.handle.setPointerCapture(e.pointerId);
+
+  // fecha o seletor de ícones para o card ficar menor durante o arraste
+  card.refs.grid.hidden = true;
+  card.refs.iconBtn.setAttribute("aria-expanded", "false");
+
+  const rect = card.el.getBoundingClientRect();
+  drag = {
+    card,
+    grab: e.clientY - rect.top, // onde o dedo/mouse pegou o card
+    y: e.clientY,
+    startOrder: savedCards()
+      .map((c) => c.id)
+      .join(","),
+    raf: 0,
+  };
+  card.el.classList.add("dragging");
+  document.body.classList.add("drag-active");
+  drag.raf = requestAnimationFrame(dragFrame);
+}
+
+function dragFrame() {
+  if (!drag) return;
+  const el = drag.card.el;
+
+  // rola a página quando o card chega perto da borda da tela
+  const margin = 70;
+  if (drag.y < margin) window.scrollBy(0, -14);
+  else if (drag.y > window.innerHeight - margin) window.scrollBy(0, 14);
+
+  const top = drag.y - drag.grab; // onde o card "quer" estar
+  el.style.transform = "";
+
+  // troca de lugar com os vizinhos quando passa do meio deles
+  for (let guard = 0; guard < 10; guard++) {
+    const height = el.getBoundingClientRect().height;
+    const prev = el.previousElementSibling;
+    const next = el.nextElementSibling;
+    const nextCard = next && cardOf(next);
+
+    if (prev) {
+      const r = prev.getBoundingClientRect();
+      if (top < r.top + r.height / 2) {
+        el.parentNode.insertBefore(el, prev);
+        continue;
+      }
+    }
+    if (next && nextCard && !nextCard.draft) {
+      const r = next.getBoundingClientRect();
+      if (top + height > r.top + r.height / 2) {
+        el.parentNode.insertBefore(next, el);
+        continue;
+      }
+    }
+    break;
+  }
+
+  // desloca o card até onde o dedo/mouse está
+  const natural = el.getBoundingClientRect().top;
+  el.style.transform = `translateY(${top - natural}px)`;
+
+  drag.raf = requestAnimationFrame(dragFrame);
+}
+
+async function endDrag(card) {
+  if (!drag || drag.card !== card) return;
+  cancelAnimationFrame(drag.raf);
+
+  const startOrder = drag.startOrder;
+  drag = null;
+
+  card.el.style.transform = "";
+  card.el.classList.remove("dragging");
+  document.body.classList.remove("drag-active");
+
+  // a lista passa a seguir a ordem que ficou na tela
+  cards = [...$("link-list").children].map(cardOf).filter(Boolean);
+
+  if (
+    savedCards()
+      .map((c) => c.id)
+      .join(",") !== startOrder
+  ) {
+    announcePosition(card);
+    await persistOrder();
+  }
+}
+
+// Mover pelo teclado (setas na alça)
+async function moveCard(card, dir) {
+  const saved = savedCards();
+  const i = saved.indexOf(card);
+  const j = i + dir;
+  if (j < 0 || j >= saved.length) return;
+  const other = saved[j];
+
+  const parent = card.el.parentNode;
+  if (dir < 0) parent.insertBefore(card.el, other.el);
+  else parent.insertBefore(other.el, card.el);
+
+  cards = [...$("link-list").children].map(cardOf).filter(Boolean);
+  card.refs.handle.focus();
+  announcePosition(card);
+  await persistOrder();
+}
+
+// ----- Ocultar e excluir (acontecem na hora) -----
 async function toggleActive(card) {
   const next = !card.active;
   card.refs.eye.disabled = true;
@@ -785,20 +1051,43 @@ async function removeCard(card) {
 
   card.el.remove();
   cards = cards.filter((c) => c !== card);
-  refreshMoveButtons();
   updateTotals();
   updateEmpty();
 }
 
-// ===== Excluir conta =====
+// ===== Excluir conta (janela por cima da tela) =====
+const deleteDialog = $("delete-dialog");
 const deleteInput = $("delete-confirm");
 const deleteBtn = $("delete-btn");
+const deleteCancel = $("delete-cancel");
 
 function confirmationMatches() {
   return (
     !!profile && deleteInput.value.trim().toLowerCase() === profile.username
   );
 }
+
+$("open-delete").addEventListener("click", () => {
+  deleteInput.value = "";
+  deleteInput.disabled = false;
+  deleteBtn.disabled = true;
+  deleteCancel.disabled = false;
+  $("delete-msg").hidden = true;
+  deleteDialog.showModal();
+  deleteInput.focus();
+});
+
+deleteCancel.addEventListener("click", () => deleteDialog.close());
+
+// Clicar fora da janela fecha (o clique no fundo escuro chega com a própria janela como alvo)
+deleteDialog.addEventListener("click", (e) => {
+  if (e.target === deleteDialog && !deleting) deleteDialog.close();
+});
+
+// Enquanto exclui, o Esc não fecha a janela
+deleteDialog.addEventListener("cancel", (e) => {
+  if (deleting) e.preventDefault();
+});
 
 // O botão só liga quando o nome de usuário digitado bate
 deleteInput.addEventListener("input", () => {
@@ -810,8 +1099,10 @@ deleteBtn.addEventListener("click", async () => {
 
   deleteBtn.disabled = true;
   deleteInput.disabled = true;
+  deleteCancel.disabled = true;
   deleting = true;
 
+  await deleteMyAvatarFiles(); // apaga as fotos do Storage antes de a conta sumir
   const { error } = await db.rpc("delete_my_account");
 
   if (error) {
@@ -823,6 +1114,7 @@ deleteBtn.addEventListener("click", async () => {
       "error",
     );
     deleteInput.disabled = false;
+    deleteCancel.disabled = false;
     deleteBtn.disabled = !confirmationMatches();
     return;
   }

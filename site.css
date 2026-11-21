@@ -212,8 +212,9 @@
 }
 
 .menu-item.primary {
-  background: var(--accent);
-  border-color: transparent;
+  background: var(--card-bg);
+  border-color: color-mix(in srgb, var(--accent) 75%, transparent);
+  box-shadow: 0 0 24px -4px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
 .menu-item.primary i {
@@ -221,7 +222,8 @@
 }
 
 .menu-item.primary:hover {
-  filter: brightness(1.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 32px -2px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
 .menu-item.danger:hover {

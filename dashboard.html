@@ -57,6 +57,18 @@
           </button>
 
           <div id="avatar-pop" class="popover" hidden>
+            <button id="avatar-upload" type="button" class="btn-ghost">
+              <i class="ph ph-upload-simple"></i>Enviar imagem
+            </button>
+            <input
+              id="avatar-file"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              hidden
+            />
+
+            <div class="or-line"><span>ou</span></div>
+
             <label for="avatar-url">Link da imagem</label>
             <input
               id="avatar-url"
@@ -66,18 +78,15 @@
               spellcheck="false"
               placeholder="https://..."
             />
-            <p id="avatar-msg" class="save-status" role="status"></p>
             <div class="row">
               <button id="avatar-apply" type="button" class="btn-ghost">
                 Usar este link
               </button>
               <button id="avatar-remove" type="button" class="btn-ghost">
-                Remover
+                Remover foto
               </button>
             </div>
-            <button type="button" class="btn-ghost" disabled>
-              Enviar imagem (em breve)
-            </button>
+            <p id="avatar-msg" class="save-status" role="status"></p>
           </div>
         </div>
 
@@ -100,13 +109,17 @@
           ></textarea>
 
           <div class="profile-actions">
-            <label class="color-pick" title="Cor de destaque da sua página">
+            <label
+              class="color-chip"
+              title="Cor do seu link em destaque e dos brilhos da sua página"
+            >
               <input
                 id="accent_color"
                 type="color"
                 value="#6366f1"
                 aria-label="Cor de destaque"
               />
+              <span>Cor de destaque</span>
             </label>
             <span id="profile-status" class="save-status" role="status"></span>
             <button id="profile-save" type="button" class="btn-save" disabled>
@@ -137,9 +150,20 @@
         <ul id="link-list" class="lcard-list"></ul>
       </section>
 
-      <!-- Excluir conta -->
-      <section class="panel danger-zone">
-        <h2>Excluir conta</h2>
+      <!-- Conta -->
+      <div class="danger-row">
+        <button id="open-delete" type="button" class="btn-ghost danger">
+          <i class="ph ph-trash"></i>Excluir conta
+        </button>
+      </div>
+
+      <p id="sr-live" class="sr-only" aria-live="polite"></p>
+    </main>
+
+    <!-- Janela de confirmação para excluir a conta -->
+    <dialog id="delete-dialog" class="modal" aria-labelledby="delete-title">
+      <div class="modal-body">
+        <h2 id="delete-title">Excluir conta</h2>
         <p class="muted-text">
           Isso apaga para sempre a sua conta, o seu perfil e todos os seus
           links. Sua página deixa de existir e o nome de usuário fica livre para
@@ -159,11 +183,16 @@
           />
         </div>
         <p id="delete-msg" class="message" role="alert" hidden></p>
-        <button id="delete-btn" type="button" class="btn-danger" disabled>
-          Excluir minha conta para sempre
-        </button>
-      </section>
-    </main>
+        <div class="row">
+          <button id="delete-cancel" type="button" class="btn-ghost">
+            Cancelar
+          </button>
+          <button id="delete-btn" type="button" class="btn-danger" disabled>
+            Excluir para sempre
+          </button>
+        </div>
+      </div>
+    </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
     <script src="js/supabase.js"></script>
