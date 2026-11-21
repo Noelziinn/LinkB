@@ -3,23 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <title>Painel | LinkB</title>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="site.css" />
     <link rel="stylesheet" href="auth.css" />
     <link rel="stylesheet" href="dashboard.css" />
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
   </head>
   <body class="dash">
     <main class="container wide" id="app" hidden>
+      <!-- Topo -->
       <header class="dash-header">
         <div class="dash-title">
           <a href="index.html" aria-label="LinkB, página inicial">
             <img class="dash-logo" src="logo.png" alt="" />
           </a>
-          <div>
+          <div class="dash-title-text">
             <h1>Painel</h1>
-            <p class="bio" id="who"></p>
+            <p class="handle" id="who"></p>
           </div>
         </div>
         <div class="dash-actions">
@@ -29,121 +31,113 @@
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            >Ver minha página</a
           >
-          <button id="logout-btn" type="button" class="btn-ghost">Sair</button>
+            <i class="ph ph-arrow-square-out"></i>Ver página
+          </a>
+          <button id="copy-link" type="button" class="btn-ghost">
+            <i class="ph ph-copy" id="copy-icon"></i
+            ><span id="copy-label" aria-live="polite">Copiar link</span>
+          </button>
         </div>
       </header>
 
-      <!-- PERFIL -->
-      <section class="panel">
-        <h2>Perfil</h2>
-        <form id="profile-form" novalidate>
-          <div class="field">
-            <label for="display_name">Nome</label>
-            <input
-              id="display_name"
-              type="text"
-              maxlength="60"
-              placeholder="Seu nome"
-            />
-          </div>
-          <div class="field">
-            <label for="bio">Bio</label>
-            <textarea
-              id="bio"
-              maxlength="160"
-              rows="3"
-              placeholder="Fale em uma frase o que você faz"
-            ></textarea>
-          </div>
-          <div class="field">
-            <label for="avatar_url">Link da foto de perfil</label>
-            <input id="avatar_url" type="url" placeholder="https://..." />
-          </div>
-          <div class="field">
-            <label for="accent_color">Cor de destaque</label>
-            <input id="accent_color" type="color" value="#6366f1" />
-          </div>
-          <p id="profile-msg" class="message" role="status" hidden></p>
-          <button type="submit" class="btn-primary" id="profile-btn">
-            Salvar perfil
+      <!-- Perfil: foto, nome e bio (clique para editar) -->
+      <section class="profile-edit" aria-label="Seu perfil">
+        <div class="avatar-edit">
+          <button
+            id="avatar-btn"
+            type="button"
+            class="avatar-btn"
+            aria-label="Alterar foto de perfil"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span id="avatar-view" class="avatar-view"></span>
+            <span class="avatar-badge"><i class="ph ph-camera"></i></span>
           </button>
-        </form>
-      </section>
 
-      <!-- LINKS -->
-      <section class="panel">
-        <h2 id="link-form-title">Adicionar link</h2>
-        <form id="link-form" novalidate>
-          <div class="field">
-            <label for="link-title">Título</label>
+          <div id="avatar-pop" class="popover" hidden>
+            <label for="avatar-url">Link da imagem</label>
             <input
-              id="link-title"
-              type="text"
-              maxlength="60"
-              placeholder="Meu portfólio"
-              required
-            />
-          </div>
-          <div class="field">
-            <label for="link-subtitle">Descrição (opcional)</label>
-            <input
-              id="link-subtitle"
-              type="text"
-              maxlength="80"
-              placeholder="Uma linha sobre o link"
-            />
-          </div>
-          <div class="field">
-            <label for="link-url">Endereço do link</label>
-            <input
-              id="link-url"
+              id="avatar-url"
               type="text"
               inputmode="url"
-              placeholder="https://seusite.com"
-              required
+              autocapitalize="none"
+              spellcheck="false"
+              placeholder="https://..."
             />
-          </div>
-          <div class="field">
-            <label for="link-icon">Ícone</label>
-            <select id="link-icon">
-              <option value="ph-link">Link</option>
-              <option value="ph-globe">Site</option>
-              <option value="ph-briefcase">Portfólio</option>
-              <option value="ph-rocket-launch">Foguete</option>
-              <option value="ph-robot">Robô</option>
-              <option value="ph-shopping-cart">Loja</option>
-              <option value="ph-envelope">E-mail</option>
-              <option value="ph-github-logo">GitHub</option>
-              <option value="ph-instagram-logo">Instagram</option>
-              <option value="ph-whatsapp-logo">WhatsApp</option>
-              <option value="ph-discord-logo">Discord</option>
-              <option value="ph-youtube-logo">YouTube</option>
-            </select>
-          </div>
-          <label class="check">
-            <input id="link-featured" type="checkbox" />
-            <span>Destacar este link</span>
-          </label>
-          <p id="link-msg" class="message" role="status" hidden></p>
-          <div class="row">
-            <button type="submit" class="btn-primary" id="link-btn">
-              Adicionar link
-            </button>
-            <button type="button" class="btn-ghost" id="link-cancel" hidden>
-              Cancelar
+            <p id="avatar-msg" class="save-status" role="status"></p>
+            <div class="row">
+              <button id="avatar-apply" type="button" class="btn-ghost">
+                Usar este link
+              </button>
+              <button id="avatar-remove" type="button" class="btn-ghost">
+                Remover
+              </button>
+            </div>
+            <button type="button" class="btn-ghost" disabled>
+              Enviar imagem (em breve)
             </button>
           </div>
-        </form>
+        </div>
+
+        <div class="profile-fields">
+          <input
+            id="display_name"
+            class="inline-input name-input"
+            type="text"
+            maxlength="60"
+            placeholder="Seu nome"
+            aria-label="Nome"
+          />
+          <textarea
+            id="bio"
+            class="inline-input bio-input"
+            rows="2"
+            maxlength="160"
+            placeholder="Adicionar algo sobre você"
+            aria-label="Bio"
+          ></textarea>
+
+          <div class="profile-actions">
+            <label class="color-pick" title="Cor de destaque da sua página">
+              <input
+                id="accent_color"
+                type="color"
+                value="#6366f1"
+                aria-label="Cor de destaque"
+              />
+            </label>
+            <span id="profile-status" class="save-status" role="status"></span>
+            <button id="profile-save" type="button" class="btn-save" disabled>
+              Salvar
+            </button>
+          </div>
+        </div>
       </section>
 
-      <section class="panel">
-        <h2>Seus links</h2>
-        <ul id="link-list" class="link-list"></ul>
+      <!-- Links -->
+      <section class="links-section" aria-label="Seus links">
+        <div class="section-head">
+          <h2>Links</h2>
+          <span id="total-clicks" class="total-clicks" hidden></span>
+        </div>
+
+        <button id="add-link" type="button" class="btn-add">
+          <i class="ph ph-plus"></i>Adicionar link
+        </button>
+
+        <p id="link-msg" class="message" role="alert" hidden></p>
+
+        <p id="empty-links" class="empty">
+          Você ainda não tem links. Clique em "Adicionar link" para criar o
+          primeiro.
+        </p>
+
+        <ul id="link-list" class="lcard-list"></ul>
       </section>
 
-      <!-- area de deletar conta-->
+      <!-- Excluir conta -->
       <section class="panel danger-zone">
         <h2>Excluir conta</h2>
         <p class="muted-text">
@@ -173,6 +167,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
     <script src="js/supabase.js"></script>
+    <script src="js/menu.js"></script>
     <script src="js/dashboard.js"></script>
   </body>
 </html>
