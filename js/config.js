@@ -11,7 +11,7 @@ const TURNSTILE_SITE_KEY = "0x4AAAAAAGK52O4rn9TdNSSN";
 
 // Entradas sociais ativas. Só coloque depois de configurar no Supabase.
 // Opções: "google", "github"
-const ENABLED_PROVIDERS = ["github"];
+const ENABLED_PROVIDERS = ["github", "google"];
 
 // Nomes que conflitam com páginas do site (mantenha igual ao social-login.sql)
 const RESERVED_USERNAMES = [
